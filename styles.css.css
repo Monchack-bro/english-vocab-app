@@ -1,0 +1,55 @@
+/* カードのアニメーション用スタイル */
+.card {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.card.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  backface-visibility: hidden;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.card-front {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+.card-back {
+  background-color: #e2e8f0;
+  color: #1e293b;
+  transform: rotateY(180deg);
+}
+
+/* レスポンシブデザイン */
+@media (max-width: 768px) {
+  .card-face {
+    font-size: 1.25rem;
+  }
+}
+
+/* ボタンのホバーエフェクト */
+button {
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 入力フィールドのフォーカススタイル */
+input:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+  border-color: #3b82f6;
+}
