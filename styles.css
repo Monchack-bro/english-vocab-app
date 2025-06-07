@@ -1,0 +1,21 @@
+/* 英単語カードの英単語を横並び・横書きで表示するための修正 */
+/* 英単語カードの英単語が縦書きにならないように強制的に横書きにする */
+/* 英単語がカードの枠内で必ず折り返され、横書きで収まるようにする */
+.card-english-word {
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  white-space: normal !important;
+  text-align: left;
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+/* 万が一、他のクラスで縦書きが指定されていた場合の対策 */
+.card .text-2xl {
+  writing-mode: initial !important;
+  display: block !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+  letter-spacing: normal !important;
+}

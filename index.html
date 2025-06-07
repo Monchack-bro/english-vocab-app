@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英単語カードアプリ</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0f7fa 0%, #f0fff4 100%);
+      font-family: 'Noto Sans JP', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .container {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      margin-top: 40px;
+      padding: 32px 24px 24px 24px;
+      width: 350px;
+      max-width: 95vw;
+    }
+    h1 {
+      text-align: center;
+      color: #1976d2;
+      margin-bottom: 24px;
+      font-size: 2rem;
+      letter-spacing: 0.12em;
+    }
+    .card {
+      background: #f7fafc;
+      border: 2px solid #b3e5fc;
+      border-radius: 16px;
+      padding: 28px 16px;
+      margin-bottom: 18px;
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+      position: relative;
+      overflow: hidden;
+    }
+    .word {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #222;
+      text-align: center;
+      word-break: break-word;
+      white-space: pre-wrap;
+      max-width: 100%;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .word:hover {
+      background: #e3f2fd;
+    }
+    .hint {
+      color: #aaa;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 6px;
+      user-select: none;
+      pointer-events: none;
+    }
+    .meaning {
+      font-size: 1.1rem;
+      color: #388e3c;
+      text-align: center;
+      word-break: break-word;
+      white-space: pre-wrap;
+      max-width: 100%;
+    }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .btn {
+      background: linear-gradient(90deg, #42a5f5 0%, #26c6da 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin: 0 4px;
+    }
+    .btn:active {
+      background: #0288d1;
+    }
+    .add-form {
+      margin-top: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .add-form input {
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1.5px solid #b3e5fc;
+      font-size: 1rem;
+    }
+    .add-form button {
+      margin-top: 6px;
+      background: linear-gradient(90deg, #26c6da 0%, #42a5f5 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 0;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .add-form button:active {
+      background: #0288d1;
+    }
+    .counter {
+      text-align: center;
+      color: #666;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>英単語カード</h1>
+    <div id="card" class="card">
+      <div class="word" id="word">---</div>
+      <div class="hint" id="hint">クリックで意味表示</div>
+      <div class="meaning" id="meaning" style="display:none;">---</div>
+    </div>
+    <div class="controls">
+      <button class="btn" id="prev">前へ</button>
+      <div class="counter" id="counter">0 / 0</div>
+      <button class="btn" id="next">次へ</button>
+    </div>
+    <form class="add-form" id="addForm">
+      <input type="text" id="english" placeholder="英単語やフレーズ" required />
+      <input type="text" id="japanese" placeholder="日本語訳" required />
+      <button type="submit">カードを追加</button>
+    </form>
+  </div>
+  <script>
+    let cards = [];
+    let current = 0;
+    const wordDiv = document.getElementById('word');
+    const meaningDiv = document.getElementById('meaning');
+    const counterDiv = document.getElementById('counter');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const addForm = document.getElementById('addForm');
+    const englishInput = document.getElementById('english');
+    const japaneseInput = document.getElementById('japanese');
+
+    let meaningShown = false;
+    function updateCard() {
+      if (cards.length === 0) {
+        wordDiv.textContent = '---';
+        meaningDiv.textContent = '---';
+        counterDiv.textContent = '0 / 0';
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        meaningDiv.style.display = 'none';
+        document.getElementById('hint').style.display = '';
+        meaningShown = false;
+        return;
+      }
+      wordDiv.textContent = cards[current].english;
+      meaningDiv.textContent = cards[current].japanese;
+      counterDiv.textContent = `${current + 1} / ${cards.length}`;
+      prevBtn.disabled = cards.length <= 1;
+      nextBtn.disabled = cards.length <= 1;
+      meaningDiv.style.display = meaningShown ? '' : 'none';
+      document.getElementById('hint').style.display = meaningShown ? 'none' : '';
+    }
+
+    prevBtn.onclick = function() {
+      if (cards.length === 0) return;
+      current = (current - 1 + cards.length) % cards.length;
+      updateCard();
+    };
+    nextBtn.onclick = function() {
+      if (cards.length === 0) return;
+      current = (current + 1) % cards.length;
+      updateCard();
+    };
+    addForm.onsubmit = function(e) {
+      e.preventDefault();
+      const eng = englishInput.value.trim();
+      const jap = japaneseInput.value.trim();
+      if (!eng || !jap) return;
+      cards.push({ english: eng, japanese: jap });
+      current = cards.length - 1;
+      updateCard();
+      englishInput.value = '';
+      japaneseInput.value = '';
+      englishInput.focus();
+    };
+    // 英単語クリックで意味表示/非表示
+    wordDiv.onclick = function() {
+      if (cards.length === 0) return;
+      meaningShown = !meaningShown;
+      updateCard();
+    };
+    // 初期化
+    updateCard();
+  </script>
+</body>
+</html>
